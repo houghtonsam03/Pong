@@ -2,14 +2,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Game {
     //Static values
-    static int gameWidth = 3000;
-    static int gameHeight = 1600;
-    static int blockerWidth = 100;
-    static int blockerHeight = 500;
-    static int ballWidth = 100;
-    static int ballHeight = 100;
-    static int LBlockerX = 200;
-    static int RBlockerX = gameWidth-(LBlockerX+blockerWidth);
     static int FPS = 20;
 
     // Constant attributes
@@ -22,10 +14,10 @@ public class Game {
     private float ballSpeed;
     private float[] ballPos; // {ball1X,ball1Y,ball2X,ball2Y,...}
     private float[] ballVel; // ...
-    private float LBlockerPos;
-    private float LBlockerVel;
-    private float RBlockerPos;
-    private float RBlockerVel;
+    private float LBlockerPos; // Y-Coordinate
+    private float LBlockerVel; // Y-Coordinate
+    private float RBlockerPos; // Y-Coordinate
+    private float RBlockerVel; // Y-Coordinate
     private int[] ballScore; // Amount of balls scored for L & R. {LScore,RScore}. 
     private boolean gameOver;
     private char winner;
@@ -49,9 +41,9 @@ public class Game {
         // Initialise ballPositions.
         for (int i=0;i<ballAmount;i++) {
             if (i % 2 == 0) 
-                ballPos[i] = (gameWidth-ballWidth)/2; // Middle of the ball is in the middle of the screen.
+                ballPos[i] = (PongPanel.gameWidth-PongPanel.ballSize)/2; // Middle of the ball is in the middle of the screen.
             else
-                ballPos[i] = (gameHeight-ballHeight)/2; // Middle of the ball is in the middle of the screen.
+                ballPos[i] = (PongPanel.gameHeight-PongPanel.ballSize)/2; // Middle of the ball is in the middle of the screen.
         }
         
         // Initialise ballVelocities.
@@ -72,9 +64,9 @@ public class Game {
         }
 
         // Initialise blockers.
-        LBlockerPos = (gameHeight-blockerHeight)/2;
+        LBlockerPos = (PongPanel.gameHeight-PongPanel.blockerHeight)/2;
         LBlockerVel = 0;
-        RBlockerPos = (gameHeight-blockerHeight)/2;
+        RBlockerPos = LBlockerPos;
         RBlockerVel = 0;
 
         // Send initial state.

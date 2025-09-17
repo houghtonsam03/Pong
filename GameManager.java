@@ -49,6 +49,14 @@ public class GameManager {
         window = new Window(shown);
         
     }
+    public void Start() {
+        // TODO : Implement Threading
+        for (Game g : games)
+            try {
+                g.Run();
+            }
+            catch (Exception e) {}
+    }
     public void Update(int id,float[] info) {
         for (int i=0;i<info.length;i++) {
             gameInfo[id][i] = info[i];
