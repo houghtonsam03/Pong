@@ -8,15 +8,24 @@ public class GameManager {
     private Window window;
 
     public GameManager(int gameAmount,int ballAmount,boolean LAI, boolean RAI) {
+        // Checking bad parameters
         if (gameAmount > 1 && (!LAI || !RAI)) {
             throw new RuntimeException("Humans cannot play multiple games in parallell.");
         }
         else if (gameAmount < 1 ) {
             throw new RuntimeException("Cannot play less than 1 game");
         }
+        // Init.
         games = new Game[gameAmount];
         gameInfo = new float[gameAmount][2+ballAmount*2];
         score = new int[2];
+
+        // Creating Agents (AI)
+        agents = new Agent[2];
+        if (LAI)
+            agents[0] = new Agent();
+        if (RAI)
+            agents[1] = new Agent();
 
         // Setup games
         int sp = 1;
