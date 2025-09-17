@@ -18,6 +18,16 @@ public class GameManager {
         gameInfo = new float[gameAmount][2+ballAmount*2];
         score = new int[2];
 
+        // Setup games
+        int sp = 1;
+        if (gameAmount > 1)
+            sp = 4;
+        for (int i=0;i<gameAmount;i++) {
+            Game g = new Game(i,sp,ballAmount,this);
+            g.Setup();
+            games[i] = g;
+        }
+
         // Show Max 8 games. Then, either show (8,6,4,2,1) games.
         int shown = Math.min(8,gameAmount);
         if (shown % 2 == 1 && shown != 1)
@@ -26,10 +36,23 @@ public class GameManager {
         for (int i=0;i<shown;i++) 
             shownGames[i] = games[i];
 
-        window = new Window(shownGames);
+        // Window
+        window = new Window(shown);
         
     }
     public void Update(int id,float[] info) {
+        for (int i=0;i<info.length;i++) {
+            gameInfo[id][i] = info[i];
+        }
+        agents[id].Update(gameInfo[id]);
+        if (id <= shownGames.length - 1)
+            window.Update(id,gameInfo[id]);
 
+    }
+    public void GameOver(int id,String message) {
+        if (message.toCharArray()[0] == 'L') 
+            score[0]++;
+        else
+            score[1]++;
     }
 }

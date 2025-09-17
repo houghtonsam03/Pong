@@ -45,7 +45,7 @@ public class Game {
         ballScore = new int[2];
         gameOver = false;
     }
-    public void Start() {
+    public void Setup() {
         // Initialise ballPositions.
         for (int i=0;i<ballAmount;i++) {
             if (i % 2 == 0) 
@@ -77,11 +77,8 @@ public class Game {
         RBlockerPos = (gameHeight-blockerHeight)/2;
         RBlockerVel = 0;
 
-        // Run the game.
-        try {
-            Run();
-        } 
-        catch (Exception e) {}
+        // Send initial state.
+        sendUpdate();
     }
     public void Run() throws InterruptedException{
 
@@ -95,7 +92,10 @@ public class Game {
         GameOverUpdate();
     }
     public void RunPhysics() {
-        return;
+        for (int i=0;i<ballAmount*2;i=i+2) {
+            ballPos[i] += ballVel[i];
+            ballPos[i+1] += ballVel[i+1];
+        }
     }
     public void Listen(String actionL,String actionR) {
         return;
