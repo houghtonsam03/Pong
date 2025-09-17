@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit;
+
 public class Game {
     //Static values
     static int gameWidth = 3000;
@@ -8,13 +10,12 @@ public class Game {
     static int ballHeight = 100;
     static int LBlockerX = 200;
     static int RBlockerX = gameWidth-(LBlockerX+blockerWidth);
-    static int FPS = 60;
+    static int FPS = 20;
 
     // Constant attributes
-    private boolean leftAI; // If the left blocker is played by AI.
-    private boolean rightAI; // If the right blocker is played by AI.
     private int gameSpeed = 1;
     private int ballAmount; // Allow multiple balls in play.
+    private int ID;
 
     // Changing attributes
     // All position coordinates are the bottom left corner of an object.
@@ -29,12 +30,14 @@ public class Game {
     private boolean gameOver;
     private char winner;
 
+    // Classes
+    GameManager manager;
 
-    public Game(boolean LAI,boolean RAI,int speed,int bAmount) {
-        leftAI = LAI;
-        rightAI = RAI;
+    public Game(int id,int speed,int bAmount,GameManager man) {
+        ID = id;
         gameSpeed = speed;
         ballAmount = bAmount;
+        manager = man;
 
         ballSpeed = 10;
         ballPos = new float[2*ballAmount];
@@ -75,13 +78,17 @@ public class Game {
         RBlockerVel = 0;
 
         // Run the game.
-        Run();
+        try {
+            Run();
+        } 
+        catch (Exception e) {}
     }
-    public void Run() {
+    public void Run() throws InterruptedException{
 
         while (!gameOver) {
             sendUpdate();
             RunPhysics();
+            TimeUnit.MILLISECONDS.sleep(1000/(FPS*gameSpeed));
         }
 
         sendUpdate();
@@ -93,14 +100,14 @@ public class Game {
     public void Listen(String actionL,String actionR) {
         return;
     }
-    public float[] sendUpdate() {
+    public void sendUpdate() {
         // {LeftBlockerY,RightBlockerY,Ball1X,Ball1Y,Ball2X,ball2Y,...}
         float[] update = new float[ballPos.length+2];
         update[0] = LBlockerPos; update[1] = RBlockerPos;
         for(int i=0;i<ballAmount*2;i++) {
             update[i+2] = ballPos[i];
         }
-        return update;
+        manager.Update(ID,update);
     }
     public String GameOverUpdate() {
         if (winner == 'L') {
