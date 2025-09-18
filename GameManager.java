@@ -12,7 +12,7 @@ public class GameManager {
     private Game[] shownGames; // List of games that are drawn
     private Agent[] agents; // A list of AI-agents
     private float[][] gameInfo; // The stored game-states
-    private int[] score; // How many games have been won
+    private int[] score; // How many games have been won {LeftWin,RightWin,Ties}
     private Window window;
     private boolean L; // If Left is an AI
     private boolean R; // If Right is an AI
@@ -28,7 +28,7 @@ public class GameManager {
         // Init.
         games = new Game[gameAmount];
         gameInfo = new float[gameAmount][2+ballAmount*2];
-        score = new int[2];
+        score = new int[3];
 
         // Creating Agents (AI)
         agents = new Agent[2];
@@ -80,18 +80,21 @@ public class GameManager {
         for (int i=0;i<info.length;i++) {
             gameInfo[id][i] = info[i];
         }
-        if (L) agents[0].Update(id,gameInfo[id]);
-        if (R) agents[1].Update(id,gameInfo[id]);
+        if (L) agents[0].Update(id,info);
+        if (R) agents[1].Update(id,info);
         if (id <= shownGames.length - 1)
-            window.Update(id,gameInfo[id]);
+            window.Update(id,info);
         
     }
     public void GameOver(int id,String message) {
-        if (message.toCharArray()[0] == 'L') 
+        char winner = message.toCharArray()[0];
+        if (winner == 'L') 
             score[0]++;
-        else
+        else if (winner == 'R')
             score[1]++;
-        window.UpdateScore(score);
+        else
+            score[2]++;
+        window.UpdateScore(id,score);
     }
     private void SetupKeyInputs() {
         JPanel panel = window.getPanel(); // Make sure Window has a getPanel() method

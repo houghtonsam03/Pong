@@ -5,7 +5,7 @@ public class Window extends JFrame{
     private int windowWidth = 2500;
     private int windowHeight = 1200;
     private PongPanel[] pongList;
-    private int[] gameScore;
+    private JLabel score;
     public Window(int games,float[][] states) {
 
         JPanel scoreboard = new JPanel(); scoreboard.setBackground(Color.BLACK);
@@ -21,8 +21,7 @@ public class Window extends JFrame{
 
 
         // Creating the scoreboard
-        gameScore = new int[2];
-        JLabel score = new JLabel(gameScore[0] + " - " + gameScore[1]);
+        score = new JLabel(0 + " - " + 0 + "  (" + 0 + ")");
         score.setFont(new Font("SansSerif",Font.BOLD,50)); score.setForeground(Color.WHITE);
         gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 1.0; gbc.weighty = 0.2; gbc.anchor = GridBagConstraints.PAGE_START; gbc.fill = GridBagConstraints.NONE;
@@ -86,8 +85,10 @@ public class Window extends JFrame{
         pongList[id].repaint();
     }
 
-    public void UpdateScore(int[] score) {
-        gameScore = score;
+    public void UpdateScore(int id, int[] sc) {
+        score.setText(Integer.toString(sc[0]) + " - " + Integer.toString(sc[1]) + "  (" + Integer.toString(sc[2])+ ")");
+        pongList[id].GameOver();
+        repaint();
     }
 
     public JPanel getPanel() {

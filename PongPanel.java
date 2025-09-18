@@ -46,15 +46,19 @@ public class PongPanel extends JPanel{
 
         // Example: draw balls
         g2.setColor(Color.RED);
-        for (int i=2;i<state.length;i=i+2) { // assume ballsState holds logical positions
-            int bx = Math.round(state[i] * scaleX);
-            int by = Math.round(state[i+1] * scaleY);
-            int bs = Math.round(ballSize * scaleX); // scale uniformly with X or average X/Y
-            g2.fillOval(bx, by, bs, bs);
+        for (int i=2;i<state.length;i=i+2) { 
+            if (!Float.isNaN(state[i]) && !Float.isNaN(state[i+1])) {
+                int bx = Math.round(state[i] * scaleX);
+                int by = Math.round(state[i+1] * scaleY);
+                int bs = Math.round(ballSize * scaleX); // scale uniformly with X or average X/Y
+                g2.fillOval(bx, by, bs, bs);
+            }
         }
     }
     public void Update(float[] st) {
         state = st;
     }
-    
+    public void GameOver() {
+        state = new float[]{(gameHeight-blockerHeight)/2,(gameHeight-blockerHeight)/2};
+    }
 }

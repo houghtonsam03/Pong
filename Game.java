@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Game {
@@ -14,12 +15,11 @@ public class Game {
     // Changing attributes
     // All position coordinates are the bottom left corner of an object.
     private float ballSpeed;
-    private float[] ballPos; // {ball1X,ball1Y,ball2X,ball2Y,...}
-    private float[] ballVel; // ...
     private float[] BlockerMovement; // {LeftBlockerPos,RightBlockerPos,LeftBlockerVel,RightBlockerVel,LeftBlockerAcc,RightBlockerAcc}
     private int[] ballScore; // Amount of balls scored for L & R. {LScore,RScore}. 
     private boolean gameOver;
     private char winner;
+    private ArrayList<Ball> toRemove = new ArrayList<>(); // Balls to remove in the future. 
 
     private boolean leftUpHeld;
     private boolean leftDownHeld;
@@ -27,6 +27,7 @@ public class Game {
     private boolean rightDownHeld;
     // Classes
     GameManager manager;
+    private ArrayList<Ball> balls = new ArrayList<>();
 
     public Game(int id,int speed,int bAmount,GameManager man) {
         ID = id;
@@ -35,18 +36,14 @@ public class Game {
         manager = man;
 
         ballSpeed = 5;
-        ballPos = new float[2*ballAmount];
-        ballVel = new float[2*ballAmount];
         BlockerMovement = new float[6];
         ballScore = new int[2];
         gameOver = false;
     }
     public void Setup() {
         // Initialise ballPositions.
-        for (int i=0;i<ballAmount;i=i+2) {
-            ballPos[i] = (PongPanel.gameWidth-PongPanel.ballSize)/2;
-            ballPos[i+1] = (PongPanel.gameHeight-PongPanel.ballSize)/2;
-        }
+        float ballX = (PongPanel.gameWidth-PongPanel.ballSize)/2;
+        float ballY = (PongPanel.gameHeight-PongPanel.ballSize)/2;
         
         // Initialise ballVelocities.
         // Find a random avarage direction angle for all balls.
@@ -59,10 +56,11 @@ public class Game {
         }
         // Make random directions based on the avarage angle.
         double ang;
-        for (int i=0;i<ballAmount;i=i+2) {
+        for (int i=0;i<ballAmount;i++) {
             ang = randAng + 10*(Math.random()-0.5);
-            ballVel[i] = (float)Math.cos(ang)*ballSpeed;
-            ballVel[i+1] = (float)Math.sin(ang)*ballSpeed;
+            float velX = (float)Math.cos(ang)*ballSpeed;
+            float velY = (float)Math.sin(ang)*ballSpeed;
+            balls.add(new Ball(ballX, ballY, velX, velY));
         }
 
         // Initialise blockers.
@@ -72,6 +70,8 @@ public class Game {
         BlockerMovement[1] = (PongPanel.gameHeight-PongPanel.blockerHeight)/2;
         BlockerMovement[3] = 0;
         BlockerMovement[5] = 0;
+
+        Debug();
 
         // Send initial state.
         sendUpdate();
@@ -84,26 +84,27 @@ public class Game {
             TimeUnit.MILLISECONDS.sleep(1000/(FPS*gameSpeed));
         }
         sendUpdate();
-        GameOverUpdate();
+        manager.GameOver(ID,GameOverUpdate());
     }
     public void RunPhysics() {
-        for (int i=0;i<ballAmount*2;i=i+2) {
-            moveBall(i);
+        for (Ball ball : balls) {
+            moveBall(ball);
         }
+        removeBalls();
         moveBlockers();
     }
-    private void moveBall(int i) {
-        float newX = ballPos[i] + ballVel[i];
-        float newY = ballPos[i+1] + ballVel[i+1];
+    private void moveBall(Ball ball) {
+        float newX = ball.x + ball.xvel;
+        float newY = ball.y + ball.yvel;
         // Collision with the top of the screen
         if (newY < 0) {
-            ballPos[i+1] = -newY;
-            ballVel[i+1] = -ballVel[i+1];
+            ball.y = -newY;
+            ball.yvel = -ball.yvel;
         }
         // Collision with the bottom of the screen
         else if (newY + PongPanel.ballSize > PongPanel.gameHeight) {
-            ballPos[i+1] = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize);
-            ballVel[i+1] = -ballVel[i+1];
+            ball.y = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize);
+            ball.yvel = -ball.yvel;
         }
         // Collision with the top of the blocker
         else if (false) {
@@ -115,7 +116,7 @@ public class Game {
         }
         // No Y-collision
         else {
-            ballPos[i+1] = newY;
+            ball.y = newY;
         }
         // Collision with Left Blocker (on the right of the blocker)
         if (false) {
@@ -127,9 +128,30 @@ public class Game {
         }
         // No X-collision
         else {
-            ballPos[i] = newX;
+            ball.x = newX;
         }
-
+        // Check winning balls
+        if (ball.x > PongPanel.gameWidth) {
+            ballScore[0]++;
+            toRemove.add(ball);
+            ballAmount--;
+            if (ballAmount == 0) {
+                gameOver = true;
+            }
+        }
+        else if (ball.x + PongPanel.ballSize < 0) {
+            ballScore[1]++;
+            toRemove.add(ball);
+            ballAmount--;
+            if (ballAmount == 0) {
+                gameOver = true;
+            }
+        }
+    }
+    private void removeBalls() {
+        for (Ball ball : toRemove) {
+            balls.remove(ball);
+        }
     }
     private void moveBlockers() {
         // For both blockers
@@ -162,11 +184,6 @@ public class Game {
             else {
                 BlockerMovement[i] = newPos;
             }
-
-            // System.out.println("Blocker: " + Integer.toString(i+1));
-            // System.out.println("BlockerPos: " + Float.toString(BlockerMovement[i]));
-            // System.out.println("BlockerVel: " + Float.toString(BlockerMovement[i+2]));
-            // System.out.println("BlockerAcc: " + Float.toString(BlockerMovement[i+4]));
         }
 
     }
@@ -196,17 +213,37 @@ public class Game {
     }
     public void sendUpdate() {
         // {LeftBlockerY,RightBlockerY,Ball1X,Ball1Y,Ball2X,ball2Y,...}
-        float[] update = new float[ballPos.length+2];
+        float[] update = new float[2*balls.size()+2];
         update[0] = BlockerMovement[0]; update[1] = BlockerMovement[1];
-        for(int i=0;i<ballAmount*2;i++) {
-            update[i+2] = ballPos[i];
+        int i = 2;
+        for(Ball ball : balls) {
+            update[i] = ball.x;
+            update[i+1] = ball.y;
+            i=i+2;
         }
         manager.Update(ID,update);
     }
     public String GameOverUpdate() {
-        if (winner == 'L') {
-            return "W->L:" + Integer.toString(ballScore[0]) + "-" + Integer.toString(ballScore[1]);
+        Debug();
+        if (ballScore[0] > ballScore[1]) {
+            return "L:" + Integer.toString(ballScore[0]) + "-" + Integer.toString(ballScore[1]);
         }
-        return "W->R:" + Integer.toString(ballScore[1]) + "-" + Integer.toString(ballScore[0]);
+        else if (ballScore[1] > ballScore[0])
+            return "R:" + Integer.toString(ballScore[1]) + "-" + Integer.toString(ballScore[0]);
+        else
+            return "T:" + Integer.toString(ballScore[1]) + "-" + Integer.toString(ballScore[0]);
+    }
+    private void Debug() {
+        for (int i=0;i<2;i++) {
+            System.out.println("Blocker: " + Integer.toString(i+1));
+            System.out.println("BlockerPos: " + Float.toString(BlockerMovement[i]));
+            System.out.println("BlockerVel: " + Float.toString(BlockerMovement[i+2]));
+            System.out.println("BlockerAcc: " + Float.toString(BlockerMovement[i+4]));
+        }
+        for (int i=0;i<ballAmount;i++) {
+            System.out.println("Ball: " + Integer.toString(i+1));
+            System.out.println("BallPos: " + "(" + Float.toString(balls.get(i).x) + "-" + Float.toString(balls.get(i).y) + ")");
+            System.out.println("BallVel: " + "(" + Float.toString(balls.get(i).xvel) + "-" + Float.toString(balls.get(i).yvel) + ")");
+        }
     }
 }

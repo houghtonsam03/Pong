@@ -11,7 +11,6 @@ public class Agent {
         left = l;
     }
     public void Update(int id,float[] state) {
-        System.out.println(id);
         states[id] = state;
         manager.Listen(id, left, Math.random()>0.5); 
     }
