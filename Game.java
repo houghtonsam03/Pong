@@ -133,7 +133,7 @@ public class Game {
             else if (BlockerMovement[0]+PongPanel.blockerHeight < middleY) pY = BlockerMovement[0]+PongPanel.blockerHeight;
         }
         // Check for collision
-        if (Math.pow(pX-middleX, 2)+Math.pow(pY-middleY, 2) < PongPanel.ballSize/2) {
+        if (Math.pow(pX-middleX, 2)+Math.pow(pY-middleY, 2) < Math.pow(PongPanel.ballSize/2,2)) {
             float dirX = middleX-pX;
             float dirY = middleY-pY;
             dirX = dirX / Math.abs(dirX);
