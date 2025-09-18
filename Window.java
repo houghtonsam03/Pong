@@ -89,4 +89,8 @@ public class Window extends JFrame{
     public void UpdateScore(int[] score) {
         gameScore = score;
     }
+
+    public JPanel getPanel() {
+        return (JPanel)this.getContentPane();
+    }
 }

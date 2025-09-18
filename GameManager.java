@@ -1,11 +1,21 @@
 
+import java.awt.event.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 public class GameManager {
-    private Game[] games;
-    private Game[] shownGames;
-    private Agent[] agents;
-    private float[][] gameInfo;
-    private int[] score;
+    private Game[] games; // List of all games
+    private Game[] shownGames; // List of games that are drawn
+    private Agent[] agents; // A list of AI-agents
+    private float[][] gameInfo; // The stored game-states
+    private int[] score; // How many games have been won
     private Window window;
+    private boolean L; // If Left is an AI
+    private boolean R; // If Right is an AI
 
     public GameManager(int gameAmount,int ballAmount,boolean LAI, boolean RAI) {
         // Checking bad parameters
@@ -22,9 +32,11 @@ public class GameManager {
 
         // Creating Agents (AI)
         agents = new Agent[2];
-        if (LAI)
+        L = LAI;
+        R = RAI;
+        if (L)
             agents[0] = new Agent();
-        if (RAI)
+        if (R)
             agents[1] = new Agent();
 
         // Show Max 8 games. Then, either show (8,6,4,2,1) games.
@@ -47,6 +59,8 @@ public class GameManager {
             g.Setup();
             games[i] = g;
         }
+        // Setup Inputs
+        SetupKeyInputs();
         
     }
     public void Start() {
@@ -81,6 +95,66 @@ public class GameManager {
         else
             score[1]++;
         window.UpdateScore(score);
+    }
+    private void SetupKeyInputs() {
+        JPanel panel = window.getPanel(); // Make sure Window has a getPanel() method
+        InputMap im = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = panel.getActionMap();
+
+        String leftUp = null; String leftDown = null;
+        String rightUp = null; String rightDown = null;
+        if (!L && !R) {
+            leftUp = "W"; leftDown = "S";
+            rightUp = "UP"; rightDown = "DOWN";
+        } else if (!L) {
+            leftUp = "W"; leftDown = "S";
+        } else if (!R) {
+            rightUp = "W"; rightDown = "S";
+        }
+        // Left player
+        if (!L) {
+            im.put(KeyStroke.getKeyStroke(("pressed "+leftUp)), "leftUpPressed");
+            am.put("leftUpPressed", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(true, true, true); }
+            });
+
+            im.put(KeyStroke.getKeyStroke(("released "+leftUp)), "leftUpReleased");
+            am.put("leftUpReleased", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(true, true, false); }
+            });
+            im.put(KeyStroke.getKeyStroke(("pressed "+leftDown)), "leftDownPressed");
+            am.put("leftDownPressed", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(true, false, true); }
+            });
+
+            im.put(KeyStroke.getKeyStroke(("released "+leftDown)), "leftDownReleased");
+            am.put("leftDownReleased", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(true, false, false); }
+            });
+            
+        }
+
+        // Right player
+        if (!R) {
+            im.put(KeyStroke.getKeyStroke(("pressed "+rightUp)), "rightUpPressed");
+            am.put("rightUpPressed", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(false, true, true); }
+            });
+
+            im.put(KeyStroke.getKeyStroke(("released "+rightUp)), "rightUpReleased");
+            am.put("rightUpReleased", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(false, true, false); }
+            });
+            im.put(KeyStroke.getKeyStroke(("pressed "+rightDown)), "rightDownPressed");
+            am.put("rightDownPressed", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(false, false, true); }
+            });
+
+            im.put(KeyStroke.getKeyStroke(("released "+rightDown)), "rightDownReleased");
+            am.put("rightDownReleased", new AbstractAction() {
+                public void actionPerformed(ActionEvent e) { games[0].Listen(false, false, false); }
+            });
+        }
     }
     public void Debug() {
         for (int i=0;i<games.length;i++) {

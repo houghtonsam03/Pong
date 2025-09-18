@@ -4,7 +4,7 @@ public class Game {
     //Static values
     static int FPS = 60;
     static float elasticity = 0.9f;
-    static float drag = 0.5f;
+    static float drag = 0.01f;
 
     // Constant attributes
     private int gameSpeed = 1;
@@ -21,6 +21,10 @@ public class Game {
     private boolean gameOver;
     private char winner;
 
+    private boolean leftUpHeld;
+    private boolean leftDownHeld;
+    private boolean rightUpHeld;
+    private boolean rightDownHeld;
     // Classes
     GameManager manager;
 
@@ -129,9 +133,31 @@ public class Game {
     }
     private void moveBlockers() {
         // For both blockers
-        for (int i=0;i<2;i++) {
-            BlockerMovement[i+4] += -Math.signum(BlockerMovement[i+2])*Math.pow(BlockerMovement[i+2], 2)*drag;
-            BlockerMovement[i+2] += BlockerMovement[i+4]; // vel += acc;
+        for (int i=0;i<2;i++) { 
+            float acc = 0;
+            if (i == 0) { // Left blocker
+                if (leftUpHeld) acc -= 1f;
+                if (leftDownHeld) acc += 1f;
+            } else { // Right blocker
+                if (rightUpHeld) acc -= 1f;
+                if (rightDownHeld) acc += 1f;
+            }
+
+            // Apply acceleration
+            BlockerMovement[i+2] += acc;
+            BlockerMovement[i+2] *= (1 - drag*4);
+            
+
+            float velChange = BlockerMovement[i+2] + BlockerMovement[i+4];
+            if (Math.abs(velChange) < 2 && Math.abs(velChange)<Math.abs(BlockerMovement[i+2])) {
+                BlockerMovement[i+2] = 0;
+                BlockerMovement[i+4] = 0;
+            }
+            else {
+                BlockerMovement[i+2] += BlockerMovement[i+4]; // vel += acc;
+                BlockerMovement[i+2] *= (1-drag);
+            }
+            
             float newPos = BlockerMovement[i] + BlockerMovement[i+2];
             // Collision with the top of the screen
             if (newPos < 0) {
@@ -140,18 +166,26 @@ public class Game {
             }
             // Collision with the bottom of the screen
             else if (newPos + PongPanel.blockerHeight > PongPanel.gameHeight) {
-                BlockerMovement[i] = 2*PongPanel.gameHeight - newPos - PongPanel.blockerHeight;
+                BlockerMovement[i] = Math.min(PongPanel.gameHeight - PongPanel.blockerHeight,2*PongPanel.gameHeight - newPos - PongPanel.blockerHeight);
                 BlockerMovement[i+2] = -BlockerMovement[i+2]*elasticity;
             // No collision
             } 
             else {
                 BlockerMovement[i] = newPos;
             }
+
+            // System.out.println("Blocker: " + Integer.toString(i+1));
+            // System.out.println("BlockerPos: " + Float.toString(BlockerMovement[i]));
+            // System.out.println("BlockerVel: " + Float.toString(BlockerMovement[i+2]));
+            // System.out.println("BlockerAcc: " + Float.toString(BlockerMovement[i+4]));
         }
 
     }
-    public void Listen(String actionL,String actionR) {
-        return;
+    public void Listen(boolean left, boolean actionUp, boolean pressed) {
+        if (left && actionUp) leftUpHeld = pressed;
+        if (left && !actionUp) leftDownHeld = pressed;
+        if (!left && actionUp) rightUpHeld = pressed;
+        if (!left && !actionUp) rightDownHeld = pressed;
     }
     public void sendUpdate() {
         // {LeftBlockerY,RightBlockerY,Ball1X,Ball1Y,Ball2X,ball2Y,...}
