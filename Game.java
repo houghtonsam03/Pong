@@ -18,7 +18,6 @@ public class Game {
     private float[] BlockerMovement; // {LeftBlockerPos,RightBlockerPos,LeftBlockerVel,RightBlockerVel,LeftBlockerAcc,RightBlockerAcc}
     private int[] ballScore; // Amount of balls scored for L & R. {LScore,RScore}. 
     private boolean gameOver;
-    private char winner;
     private ArrayList<Ball> toRemove = new ArrayList<>(); // Balls to remove in the future. 
 
     private boolean leftUpHeld;
@@ -106,28 +105,45 @@ public class Game {
             ball.y = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize);
             ball.yvel = -ball.yvel;
         }
-        // Collision with the top of the blocker
-        else if (false) {
-            
+        // Collision with the blocker
+        float middleX = ball.x+PongPanel.ballSize/2;
+        float middleY = ball.y+PongPanel.ballSize/2;
+        float pX = Float.MAX_VALUE;
+        float pY = Float.MAX_VALUE;
+        // Right side of pong
+        if (middleX > PongPanel.gameWidth/2) {
+            // X
+            if (middleX < PongPanel.RBlockerX) pX = PongPanel.RBlockerX;
+            else if (PongPanel.RBlockerX < middleX && middleX < PongPanel.RBlockerX+PongPanel.blockerWidth) pX = middleX;
+            else if (PongPanel.RBlockerX+PongPanel.blockerWidth < middleX) pX = PongPanel.RBlockerX+PongPanel.blockerWidth;
+            // Y
+            if (middleY < BlockerMovement[1]) pY = BlockerMovement[1];
+            else if (BlockerMovement[1] < middleY && middleY < BlockerMovement[1]+PongPanel.blockerHeight) pY = middleY;
+            else if (BlockerMovement[1]+PongPanel.blockerHeight < middleY) pY = BlockerMovement[1]+PongPanel.blockerHeight;
         }
-        // Collision with the bottom of the blocker
-        else if (false) {
-
+        // Left side of pong
+        else {
+            // X
+            if (middleX < PongPanel.LBlockerX) pX = PongPanel.LBlockerX;
+            else if (PongPanel.LBlockerX < middleX && middleX < PongPanel.LBlockerX+PongPanel.blockerWidth) pX = middleX;
+            else if (PongPanel.LBlockerX+PongPanel.blockerWidth < middleX) pX = PongPanel.LBlockerX+PongPanel.blockerWidth;
+            // Y
+            if (middleY < BlockerMovement[0]) pY = BlockerMovement[0];
+            else if (BlockerMovement[0] < middleY && middleY < BlockerMovement[0]+PongPanel.blockerHeight) pY = middleY;
+            else if (BlockerMovement[0]+PongPanel.blockerHeight < middleY) pY = BlockerMovement[0]+PongPanel.blockerHeight;
         }
-        // No Y-collision
+        // Check for collision
+        if (Math.pow(pX-middleX, 2)+Math.pow(pY-middleY, 2) < PongPanel.ballSize/2) {
+            float dirX = middleX-pX;
+            float dirY = middleY-pY;
+            dirX = dirX / Math.abs(dirX);
+            dirY = dirY / Math.abs(dirY);
+            ball.xvel = dirX*ballSpeed;
+            ball.yvel = dirY*ballSpeed;
+        }
+        // No blocker collision
         else {
             ball.y = newY;
-        }
-        // Collision with Left Blocker (on the right of the blocker)
-        if (false) {
-
-        }
-        // Collision with right blocker (on the left of the blocker)
-        else if (false) {
-
-        }
-        // No X-collision
-        else {
             ball.x = newX;
         }
         // Check winning balls
