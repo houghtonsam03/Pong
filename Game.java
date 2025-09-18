@@ -134,12 +134,7 @@ public class Game {
         }
         // Check for collision
         if (Math.pow(pX-middleX, 2)+Math.pow(pY-middleY, 2) < Math.pow(PongPanel.ballSize/2,2)) {
-            float dirX = middleX-pX;
-            float dirY = middleY-pY;
-            dirX = dirX / Math.abs(dirX);
-            dirY = dirY / Math.abs(dirY);
-            ball.xvel = dirX*ballSpeed;
-            ball.yvel = dirY*ballSpeed;
+            ball.x = 0;
         }
         // No blocker collision
         else {
