@@ -1,7 +1,19 @@
 public class Agent {
 
-    public void Update(float[] state) {
-        
+    private GameManager manager;
+    private float[][] states;
+    private int ballAmount;
+    private boolean left;
+    Agent(boolean l,GameManager man,int games,int bAmount) {
+        manager = man;
+        states = new float[games][2+2*bAmount];
+        ballAmount = bAmount;
+        left = l;
+    }
+    public void Update(int id,float[] state) {
+        System.out.println(id);
+        states[id] = state;
+        manager.Listen(id, left, Math.random()>0.5); 
     }
     
 }

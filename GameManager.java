@@ -35,9 +35,9 @@ public class GameManager {
         L = LAI;
         R = RAI;
         if (L)
-            agents[0] = new Agent();
+            agents[0] = new Agent(true,this,gameAmount,ballAmount);
         if (R)
-            agents[1] = new Agent();
+            agents[1] = new Agent(false,this,gameAmount,ballAmount);
 
         // Show Max 8 games. Then, either show (8,6,4,2,1) games.
         int shown = Math.min(8,gameAmount);
@@ -56,8 +56,8 @@ public class GameManager {
             sp = 4;
         for (int i=0;i<gameAmount;i++) {
             Game g = new Game(i,sp,ballAmount,this);
-            g.Setup();
             games[i] = g;
+            g.Setup();
         }
         // Setup Inputs
         SetupKeyInputs();
@@ -80,11 +80,8 @@ public class GameManager {
         for (int i=0;i<info.length;i++) {
             gameInfo[id][i] = info[i];
         }
-        try {
-            agents[0].Update(gameInfo[id]);
-            agents[1].Update(gameInfo[id]);
-        }
-        catch (Exception e) {}
+        if (L) agents[0].Update(id,gameInfo[id]);
+        if (R) agents[1].Update(id,gameInfo[id]);
         if (id <= shownGames.length - 1)
             window.Update(id,gameInfo[id]);
         
@@ -115,21 +112,21 @@ public class GameManager {
         if (!L) {
             im.put(KeyStroke.getKeyStroke(("pressed "+leftUp)), "leftUpPressed");
             am.put("leftUpPressed", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(true, true, true); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(true, true, true); }
             });
 
             im.put(KeyStroke.getKeyStroke(("released "+leftUp)), "leftUpReleased");
             am.put("leftUpReleased", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(true, true, false); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(true, true, false); }
             });
             im.put(KeyStroke.getKeyStroke(("pressed "+leftDown)), "leftDownPressed");
             am.put("leftDownPressed", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(true, false, true); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(true, false, true); }
             });
 
             im.put(KeyStroke.getKeyStroke(("released "+leftDown)), "leftDownReleased");
             am.put("leftDownReleased", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(true, false, false); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(true, false, false); }
             });
             
         }
@@ -138,23 +135,26 @@ public class GameManager {
         if (!R) {
             im.put(KeyStroke.getKeyStroke(("pressed "+rightUp)), "rightUpPressed");
             am.put("rightUpPressed", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(false, true, true); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(false, true, true); }
             });
 
             im.put(KeyStroke.getKeyStroke(("released "+rightUp)), "rightUpReleased");
             am.put("rightUpReleased", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(false, true, false); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(false, true, false); }
             });
             im.put(KeyStroke.getKeyStroke(("pressed "+rightDown)), "rightDownPressed");
             am.put("rightDownPressed", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(false, false, true); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(false, false, true); }
             });
 
             im.put(KeyStroke.getKeyStroke(("released "+rightDown)), "rightDownReleased");
             am.put("rightDownReleased", new AbstractAction() {
-                public void actionPerformed(ActionEvent e) { games[0].Listen(false, false, false); }
+                public void actionPerformed(ActionEvent e) { games[0].ListenHuman(false, false, false); }
             });
         }
+    }
+    public void Listen(int id, boolean left, boolean actionUp) {
+        games[id].ListenAI(left, actionUp);
     }
     public void Debug() {
         for (int i=0;i<games.length;i++) {

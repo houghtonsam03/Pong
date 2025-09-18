@@ -147,17 +147,6 @@ public class Game {
             BlockerMovement[i+2] += acc;
             BlockerMovement[i+2] *= (1 - drag*4);
             
-
-            float velChange = BlockerMovement[i+2] + BlockerMovement[i+4];
-            if (Math.abs(velChange) < 2 && Math.abs(velChange)<Math.abs(BlockerMovement[i+2])) {
-                BlockerMovement[i+2] = 0;
-                BlockerMovement[i+4] = 0;
-            }
-            else {
-                BlockerMovement[i+2] += BlockerMovement[i+4]; // vel += acc;
-                BlockerMovement[i+2] *= (1-drag);
-            }
-            
             float newPos = BlockerMovement[i] + BlockerMovement[i+2];
             // Collision with the top of the screen
             if (newPos < 0) {
@@ -181,11 +170,29 @@ public class Game {
         }
 
     }
-    public void Listen(boolean left, boolean actionUp, boolean pressed) {
+    public void ListenHuman(boolean left, boolean actionUp, boolean pressed) {
         if (left && actionUp) leftUpHeld = pressed;
         if (left && !actionUp) leftDownHeld = pressed;
         if (!left && actionUp) rightUpHeld = pressed;
         if (!left && !actionUp) rightDownHeld = pressed;
+    }
+    public void ListenAI(boolean left,boolean actionUp) {
+        if (left && actionUp) {
+            BlockerMovement[2] -= 1f;
+            BlockerMovement[2] *= (1-drag);
+        }
+        if (left && !actionUp) {
+            BlockerMovement[2] += 1f;
+            BlockerMovement[2] *= (1-drag);
+        }
+        if (!left && actionUp) {
+            BlockerMovement[3] -= 1f;
+            BlockerMovement[3] *= (1-drag);
+        }
+        if (!left && !actionUp) {
+            BlockerMovement[3] += 1f;
+            BlockerMovement[3] *= (1-drag);
+        }
     }
     public void sendUpdate() {
         // {LeftBlockerY,RightBlockerY,Ball1X,Ball1Y,Ball2X,ball2Y,...}
