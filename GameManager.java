@@ -27,16 +27,6 @@ public class GameManager {
         if (RAI)
             agents[1] = new Agent();
 
-        // Setup games
-        int sp = 1;
-        if (gameAmount > 1)
-            sp = 4;
-        for (int i=0;i<gameAmount;i++) {
-            Game g = new Game(i,sp,ballAmount,this);
-            g.Setup();
-            games[i] = g;
-        }
-
         // Show Max 8 games. Then, either show (8,6,4,2,1) games.
         int shown = Math.min(8,gameAmount);
         if (shown % 2 == 1 && shown != 1)
@@ -46,7 +36,17 @@ public class GameManager {
             shownGames[i] = games[i];
 
         // Window
-        window = new Window(shown);
+        window = new Window(shown,gameInfo);
+
+        // Setup games
+        int sp = 1;
+        if (gameAmount > 1)
+            sp = 4;
+        for (int i=0;i<gameAmount;i++) {
+            Game g = new Game(i,sp,ballAmount,this);
+            g.Setup();
+            games[i] = g;
+        }
         
     }
     public void Start() {
@@ -61,15 +61,31 @@ public class GameManager {
         for (int i=0;i<info.length;i++) {
             gameInfo[id][i] = info[i];
         }
-        agents[id].Update(gameInfo[id]);
+        try {
+            agents[0].Update(gameInfo[id]);
+            agents[1].Update(gameInfo[id]);
+        }
+        catch (Exception e) {}
         if (id <= shownGames.length - 1)
             window.Update(id,gameInfo[id]);
-
+        
     }
     public void GameOver(int id,String message) {
         if (message.toCharArray()[0] == 'L') 
             score[0]++;
         else
             score[1]++;
+        window.UpdateScore(score);
+    }
+    public void Debug() {
+        for (int i=0;i<games.length;i++) {
+            System.out.println("LeftBlocker: " + Float.valueOf(gameInfo[i][0]));
+            System.out.println("RightBlocker: " + Float.valueOf(gameInfo[i][1]));
+            for (int j=2;j<gameInfo[0].length;j=j+2) {
+                System.out.println("Ball " + Integer.toString(i/2));
+                System.out.println("X: " + Float.valueOf(gameInfo[i][j]));
+                System.out.println("Y: " + Float.valueOf(gameInfo[i][j+1]));
+            }
+        }
     }
 }

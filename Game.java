@@ -39,11 +39,9 @@ public class Game {
     }
     public void Setup() {
         // Initialise ballPositions.
-        for (int i=0;i<ballAmount;i++) {
-            if (i % 2 == 0) 
-                ballPos[i] = (PongPanel.gameWidth-PongPanel.ballSize)/2; // Middle of the ball is in the middle of the screen.
-            else
-                ballPos[i] = (PongPanel.gameHeight-PongPanel.ballSize)/2; // Middle of the ball is in the middle of the screen.
+        for (int i=0;i<ballAmount;i=i+2) {
+            ballPos[i] = (PongPanel.gameWidth-PongPanel.ballSize)/2;
+            ballPos[i+1] = (PongPanel.gameHeight-PongPanel.ballSize)/2;
         }
         
         // Initialise ballVelocities.
@@ -88,6 +86,8 @@ public class Game {
             ballPos[i] += ballVel[i];
             ballPos[i+1] += ballVel[i+1];
         }
+        LBlockerPos += LBlockerVel;
+        RBlockerPos += RBlockerVel;
     }
     public void Listen(String actionL,String actionR) {
         return;
