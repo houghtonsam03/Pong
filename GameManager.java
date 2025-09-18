@@ -50,13 +50,18 @@ public class GameManager {
         
     }
     public void Start() {
-        // TODO : Implement Threading
-        for (Game g : games)
-            try {
-                g.Run();
-            }
-            catch (Exception e) {}
+        for (Game g : games) {
+            Thread t = new Thread(() -> {
+                try {
+                    g.Run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            t.start();
+        }
     }
+
     public void Update(int id,float[] info) {
         for (int i=0;i<info.length;i++) {
             gameInfo[id][i] = info[i];
@@ -68,6 +73,8 @@ public class GameManager {
         catch (Exception e) {}
         if (id <= shownGames.length - 1)
             window.Update(id,gameInfo[id]);
+
+        Debug();
         
     }
     public void GameOver(int id,String message) {
@@ -82,7 +89,7 @@ public class GameManager {
             System.out.println("LeftBlocker: " + Float.valueOf(gameInfo[i][0]));
             System.out.println("RightBlocker: " + Float.valueOf(gameInfo[i][1]));
             for (int j=2;j<gameInfo[0].length;j=j+2) {
-                System.out.println("Ball " + Integer.toString(i/2));
+                System.out.println("Ball " + Integer.toString(j/2));
                 System.out.println("X: " + Float.valueOf(gameInfo[i][j]));
                 System.out.println("Y: " + Float.valueOf(gameInfo[i][j+1]));
             }

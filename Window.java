@@ -83,6 +83,7 @@ public class Window extends JFrame{
 
     public void Update(int id, float[] state) {
         pongList[id].Update(state);
+        pongList[id].repaint();
     }
 
     public void UpdateScore(int[] score) {
