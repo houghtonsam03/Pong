@@ -89,7 +89,43 @@ public class Game {
         moveBlockers();
     }
     private void moveBall(int i) {
-        return;
+        float newX = ballPos[i] + ballVel[i];
+        float newY = ballPos[i+1] + ballVel[i+1];
+        // Collision with the top of the screen
+        if (newY < 0) {
+            ballPos[i+1] = -newY;
+            ballVel[i+1] = -ballVel[i+1];
+        }
+        // Collision with the bottom of the screen
+        else if (newY + PongPanel.ballSize > PongPanel.gameHeight) {
+            ballPos[i+1] = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize);
+            ballVel[i+1] = -ballVel[i+1];
+        }
+        // Collision with the top of the blocker
+        else if (false) {
+            
+        }
+        // Collision with the bottom of the blocker
+        else if (false) {
+
+        }
+        // No Y-collision
+        else {
+            ballPos[i+1] = newY;
+        }
+        // Collision with Left Blocker (on the right of the blocker)
+        if (false) {
+
+        }
+        // Collision with right blocker (on the left of the blocker)
+        else if (false) {
+
+        }
+        // No X-collision
+        else {
+            ballPos[i] = newX;
+        }
+
     }
     private void moveBlockers() {
         // For both blockers
@@ -97,17 +133,18 @@ public class Game {
             BlockerMovement[i+4] += -Math.signum(BlockerMovement[i+2])*Math.pow(BlockerMovement[i+2], 2)*drag;
             BlockerMovement[i+2] += BlockerMovement[i+4]; // vel += acc;
             float newPos = BlockerMovement[i] + BlockerMovement[i+2];
-            // Collision with top
+            // Collision with the top of the screen
             if (newPos < 0) {
                 BlockerMovement[i] = -newPos;
                 BlockerMovement[i+2] = -BlockerMovement[i+2]*elasticity;
             }
-            // Collision with bottom
-            else if (newPos > PongPanel.gameHeight) {
-                BlockerMovement[i] = 2*PongPanel.gameHeight - newPos;
+            // Collision with the bottom of the screen
+            else if (newPos + PongPanel.blockerHeight > PongPanel.gameHeight) {
+                BlockerMovement[i] = 2*PongPanel.gameHeight - newPos - PongPanel.blockerHeight;
                 BlockerMovement[i+2] = -BlockerMovement[i+2]*elasticity;
             // No collision
-            } else {
+            } 
+            else {
                 BlockerMovement[i] = newPos;
             }
         }

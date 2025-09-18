@@ -10,7 +10,7 @@ public class Main {
             System.exit(1);              // exit program
         });
         GameManager gm = new GameManager(Integer.parseInt(args[0]),Integer.parseInt(args[1]),(args[2].equals("1")),(args[3].equals("1")));
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         gm.Start();
     }
 }

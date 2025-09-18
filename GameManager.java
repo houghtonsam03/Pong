@@ -73,8 +73,6 @@ public class GameManager {
         catch (Exception e) {}
         if (id <= shownGames.length - 1)
             window.Update(id,gameInfo[id]);
-
-        Debug();
         
     }
     public void GameOver(int id,String message) {
