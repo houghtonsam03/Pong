@@ -6,6 +6,7 @@ public class Game {
     static int FPS = 60;
     static float elasticity = 0.9f;
     static float drag = 0.01f;
+    static int startSpeed = 5;
 
     // Constant attributes
     private int gameSpeed = 1;
@@ -14,7 +15,6 @@ public class Game {
 
     // Changing attributes
     // All position coordinates are the bottom left corner of an object.
-    private int ballSpeed;
     private float[] BlockerMovement; // {LeftBlockerPos,RightBlockerPos,LeftBlockerVel,RightBlockerVel,LeftBlockerAcc,RightBlockerAcc}
     private int[] ballScore; // Amount of balls scored for L & R. {LScore,RScore}. 
     private boolean gameOver;
@@ -34,7 +34,6 @@ public class Game {
         ballAmount = bAmount;
         manager = man;
 
-        ballSpeed = 5;
         BlockerMovement = new float[6];
         ballScore = new int[2];
         gameOver = false;
@@ -45,21 +44,21 @@ public class Game {
         float ballY = (PongPanel.gameHeight-PongPanel.ballSize)/2;
         
         // Initialise ballVelocities.
-        // Find a random avarage direction angle for all balls.
-        double randAng;
-        if (Math.random() < 0.5) { // Randomly chooses direction to the left.
-            randAng = 140*Math.random()+110; // ang:(110,250)
-        }
-        else {
-            randAng = 140*(Math.random()-0.5); // ang:(-70,70)
-        }
-        // Make random directions based on the avarage angle.
+        // Find a random direction for each ball that excludes shooting down and up by a minimum angle difference.
+        double minAng = 20d; // angle is the minimum from shooting straight up and down.
+        double angRange = 180-2*minAng;
         double ang;
         for (int i=0;i<ballAmount;i++) {
-            ang = randAng + 10*(Math.random()-0.5);
-            float velX = (float)Math.cos(ang)*ballSpeed;
-            float velY = (float)Math.sin(ang)*ballSpeed;
-            balls.add(new Ball(ballX, ballY, velX, velY,ballSpeed));
+            if (Math.random() < 0.5) { // Randomly chooses direction to the left.
+            ang = angRange*Math.random()+(90+minAng); // ang:(90+minAng,270-minAng)
+            }
+            else {
+                ang = angRange*(Math.random()-0.5); // ang:(-90+minAng,90-minAng)
+            }
+            double rad = Math.toRadians(ang);
+            float velX = (float)Math.cos(rad);
+            float velY = (float)Math.sin(rad);
+            balls.add(new Ball(ballX, ballY, velX, velY,startSpeed));
         }
 
         // Initialise blockers.
@@ -91,11 +90,11 @@ public class Game {
         moveBlockers();
     }
     private void moveBall(Ball ball) throws Exception {
-        float newX = ball.x + ball.xvel;
-        float newY = ball.y + ball.yvel;
+        float newX = ball.x + ball.xvel*ball.speed;
+        float newY = ball.y + ball.yvel*ball.speed;
         // Collision with the top of the screen
         if (newY < 0) {
-            ball.y = -newY; // Bounce the ball based on speed
+            ball.y = (ball.y-newY); // Bounce the ball based on speed
             ball.yvel = -ball.yvel; // Flip the speed
         }
         // Collision with the bottom of the screen
@@ -148,8 +147,8 @@ public class Game {
             }
             // Push the ball out of collision
             float vdotn = ball.xvel * nx + ball.yvel * ny;
-            ball.xvel = ball.xvel - 2f * vdotn * nx;
-            ball.yvel = ball.yvel - 2f * vdotn * ny;
+            ball.xvel -= 2f * vdotn * nx;
+            ball.yvel -= 2f * vdotn * ny;
             // Move ball out of collision
             middleX = closestX + nx * r;
             middleY = closestY + ny * r;
@@ -157,11 +156,7 @@ public class Game {
             ball.y = middleY - r;
 
             // Increase the ballspeed;
-            // ball.xvel /= ball.speed;
-            // ball.yvel /= ball.speed;
-            // ball.speed++;
-            // ball.xvel *= ball.speed;
-            // ball.yvel *= ballSpeed;
+            ball.SpeedUp(2);
         }
         // No blocker collision
         else {
