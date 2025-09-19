@@ -24,7 +24,7 @@ A simple pong game which is intended to have a simple AI framework.
 }
 ```
 3) Run: `javac -d build /*.java`
-4) Run: `java src\Main.java [X] [Y] [L] [R]`  where:
+4) Run: `java -cp build Main.java [X] [Y] [L] [R]`  where:
 * X is the amount of simultaneous games.
 * Y is the amount of balls in each game.
 * L is whether the left blocker is an AI
