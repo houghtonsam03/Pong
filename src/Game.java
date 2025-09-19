@@ -1,4 +1,3 @@
-package src;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -158,6 +157,11 @@ public class Game {
             ball.y = middleY - r;
 
             // Increase the ballspeed;
+            ball.xvel /= ball.speed;
+            ball.yvel /= ball.speed;
+            ball.speed++;
+            ball.xvel *= ball.speed;
+            ball.yvel *= ballSpeed;
         }
         // No blocker collision
         else {

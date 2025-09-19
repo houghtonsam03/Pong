@@ -1,5 +1,3 @@
-package src;
-
 public class Ball {
     float x;
     float y;

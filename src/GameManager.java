@@ -1,13 +1,6 @@
-package src;
-
 import java.awt.event.*;
+import javax.swing.*;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 public class GameManager {
     private Game[] games; // List of all games
     private Game[] shownGames; // List of games that are drawn
