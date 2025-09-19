@@ -4,7 +4,8 @@ public class Ball {
     float y;
     float xvel;
     float yvel;
-    Ball(float xPos,float yPos,float xv,float yv) {
+    int speed;
+    Ball(float xPos,float yPos,float xv,float yv,int sp) {
         x = xPos;
         y = yPos;
         xvel = xv;

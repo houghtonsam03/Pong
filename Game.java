@@ -14,7 +14,7 @@ public class Game {
 
     // Changing attributes
     // All position coordinates are the bottom left corner of an object.
-    private float ballSpeed;
+    private int ballSpeed;
     private float[] BlockerMovement; // {LeftBlockerPos,RightBlockerPos,LeftBlockerVel,RightBlockerVel,LeftBlockerAcc,RightBlockerAcc}
     private int[] ballScore; // Amount of balls scored for L & R. {LScore,RScore}. 
     private boolean gameOver;
@@ -59,7 +59,7 @@ public class Game {
             ang = randAng + 10*(Math.random()-0.5);
             float velX = (float)Math.cos(ang)*ballSpeed;
             float velY = (float)Math.sin(ang)*ballSpeed;
-            balls.add(new Ball(ballX, ballY, velX, velY));
+            balls.add(new Ball(ballX, ballY, velX, velY,ballSpeed));
         }
 
         // Initialise blockers.
@@ -70,12 +70,10 @@ public class Game {
         BlockerMovement[3] = 0;
         BlockerMovement[5] = 0;
 
-        Debug();
-
         // Send initial state.
         sendUpdate();
     }
-    public void Run() throws InterruptedException{
+    public void Run() throws Exception{
 
         while (!gameOver) {
             sendUpdate();
@@ -85,56 +83,80 @@ public class Game {
         sendUpdate();
         manager.GameOver(ID,GameOverUpdate());
     }
-    public void RunPhysics() {
+    public void RunPhysics() throws Exception {
         for (Ball ball : balls) {
             moveBall(ball);
         }
         removeBalls();
         moveBlockers();
     }
-    private void moveBall(Ball ball) {
+    private void moveBall(Ball ball) throws Exception {
         float newX = ball.x + ball.xvel;
         float newY = ball.y + ball.yvel;
         // Collision with the top of the screen
         if (newY < 0) {
-            ball.y = -newY;
-            ball.yvel = -ball.yvel;
+            ball.y = -newY; // Bounce the ball based on speed
+            ball.yvel = -ball.yvel; // Flip the speed
         }
         // Collision with the bottom of the screen
         else if (newY + PongPanel.ballSize > PongPanel.gameHeight) {
-            ball.y = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize);
-            ball.yvel = -ball.yvel;
+            ball.y = Math.min(PongPanel.gameHeight - PongPanel.ballSize,2*PongPanel.gameHeight - newY - PongPanel.ballSize); // Bounce the ball based on speed
+            ball.yvel = -ball.yvel; // Flip the speed
         }
         // Collision with the blocker
-        float middleX = ball.x+PongPanel.ballSize/2;
-        float middleY = ball.y+PongPanel.ballSize/2;
-        float pX = Float.MAX_VALUE;
-        float pY = Float.MAX_VALUE;
+        float r = PongPanel.ballSize/2f;
+        float middleX = newX+r;
+        float middleY = newY+r;
+        float rectX, rectY, rectW = PongPanel.blockerWidth, rectH = PongPanel.blockerHeight;
         // Right side of pong
-        if (middleX > PongPanel.gameWidth/2) {
-            // X
-            if (middleX < PongPanel.RBlockerX) pX = PongPanel.RBlockerX;
-            else if (PongPanel.RBlockerX < middleX && middleX < PongPanel.RBlockerX+PongPanel.blockerWidth) pX = middleX;
-            else if (PongPanel.RBlockerX+PongPanel.blockerWidth < middleX) pX = PongPanel.RBlockerX+PongPanel.blockerWidth;
-            // Y
-            if (middleY < BlockerMovement[1]) pY = BlockerMovement[1];
-            else if (BlockerMovement[1] < middleY && middleY < BlockerMovement[1]+PongPanel.blockerHeight) pY = middleY;
-            else if (BlockerMovement[1]+PongPanel.blockerHeight < middleY) pY = BlockerMovement[1]+PongPanel.blockerHeight;
+        if (middleX > PongPanel.gameWidth/2f) {
+            rectX = PongPanel.RBlockerX;
+            rectY = BlockerMovement[1];
         }
         // Left side of pong
         else {
-            // X
-            if (middleX < PongPanel.LBlockerX) pX = PongPanel.LBlockerX;
-            else if (PongPanel.LBlockerX < middleX && middleX < PongPanel.LBlockerX+PongPanel.blockerWidth) pX = middleX;
-            else if (PongPanel.LBlockerX+PongPanel.blockerWidth < middleX) pX = PongPanel.LBlockerX+PongPanel.blockerWidth;
-            // Y
-            if (middleY < BlockerMovement[0]) pY = BlockerMovement[0];
-            else if (BlockerMovement[0] < middleY && middleY < BlockerMovement[0]+PongPanel.blockerHeight) pY = middleY;
-            else if (BlockerMovement[0]+PongPanel.blockerHeight < middleY) pY = BlockerMovement[0]+PongPanel.blockerHeight;
+            rectX = PongPanel.LBlockerX;
+            rectY = BlockerMovement[0];
         }
+
+        float closestX = Math.max(rectX,Math.min(rectX+rectW,middleX));
+        float closestY = Math.max(rectY,Math.min(rectY+rectH,middleY));
+
+        float dx = middleX - closestX;
+        float dy = middleY - closestY;
+
         // Check for collision
-        if (Math.pow(pX-middleX, 2)+Math.pow(pY-middleY, 2) < Math.pow(PongPanel.ballSize/2,2)) {
-            ball.x = 0;
+        if (dx*dx + dy*dy < r*r) {
+            float dist = (float)Math.hypot(dx, dy);
+            // Compute normal
+            float nx, ny;
+            if (dist == 0f) {
+                float dx2 = middleX - (rectX+PongPanel.blockerWidth/2);
+                float dy2 = middleY - (rectY+PongPanel.blockerHeight/2);
+                float len = (float)Math.hypot(dx2,dy2);
+                if (len == 0f) {
+                    System.out.println("ERROR IN COLLISION");
+                    throw new Exception("COLLISION ERROR");
+                } else {
+                    nx = dx2 / len;
+                    ny = dy2 / len;
+                }
+            }
+            else {
+                nx = dx / dist;
+                ny = dy / dist;
+            }
+            // Push the ball out of collision
+            float vdotn = ball.xvel * nx + ball.yvel * ny;
+            ball.xvel = ball.xvel - 2f * vdotn * nx;
+            ball.yvel = ball.yvel - 2f * vdotn * ny;
+            // Move ball out of collision
+            middleX = closestX + nx * r;
+            middleY = closestY + ny * r;
+            ball.x = middleX - r;
+            ball.y = middleY - r;
+
+            // Increase the ballspeed;
         }
         // No blocker collision
         else {
@@ -235,7 +257,6 @@ public class Game {
         manager.Update(ID,update);
     }
     public String GameOverUpdate() {
-        Debug();
         if (ballScore[0] > ballScore[1]) {
             return "L:" + Integer.toString(ballScore[0]) + "-" + Integer.toString(ballScore[1]);
         }
@@ -244,6 +265,7 @@ public class Game {
         else
             return "T:" + Integer.toString(ballScore[1]) + "-" + Integer.toString(ballScore[0]);
     }
+    @SuppressWarnings("unused")
     private void Debug() {
         for (int i=0;i<2;i++) {
             System.out.println("Blocker: " + Integer.toString(i+1));
