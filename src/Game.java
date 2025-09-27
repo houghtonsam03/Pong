@@ -127,23 +127,43 @@ public class Game {
         // Check for collision
         if (dx*dx + dy*dy < r*r) {
             float dist = (float)Math.hypot(dx, dy);
-            // Compute normal
-            float nx, ny;
-            if (dist == 0f) {
-                float dx2 = middleX - (rectX+PongPanel.blockerWidth/2);
-                float dy2 = middleY - (rectY+PongPanel.blockerHeight/2);
-                float len = (float)Math.hypot(dx2,dy2);
-                if (len == 0f) {
-                    System.out.println("ERROR IN COLLISION");
-                    throw new Exception("COLLISION ERROR");
-                } else {
-                    nx = dx2 / len;
-                    ny = dy2 / len;
-                }
-            }
-            else {
+            float nx = 0, ny = 0;
+            // Corner case
+            if ((closestX == rectX || closestX == rectX + rectW) && (closestY == rectY || closestY == rectY + rectH)) {
                 nx = dx / dist;
                 ny = dy / dist;
+            }
+            // Inside case
+            else if (dist == 0f) {
+                float rectHor, rectVer;
+                if (ball.xvel > 0) rectHor = rectX; // Left side
+                else rectHor = rectX + rectW; // Right side
+                if (ball.yvel > 0) rectVer = rectY; // Top side
+                else rectVer = rectY + rectH; // Bottom side
+                float alphaX = (middleX - rectHor) / ball.xvel;
+                float alphaY = (middleY - rectVer) / ball.yvel;
+                float alpha = Math.min(Math.abs(alphaX), Math.abs(alphaY));
+                float e = 0.001f; // Small value to ensure the ball is out of the blocker.
+                // Move the ball out of the blocker then run physics again.
+                ball.x -= ball.xvel * (alpha+e);
+                ball.y -= ball.yvel * (alpha+e);
+                moveBall(ball);
+                return;
+            }
+            // Flat case
+            else {
+
+                // Left or Right side
+                if (closestX == rectX || closestX == rectX + rectW) {
+                    nx = -Math.signum(ball.xvel);
+                    ny = 0;
+                }
+                // Top or Bottom side
+                else {
+                    nx = 0;
+                    ny = -Math.signum(ball.yvel);
+                }
+                
             }
             // Push the ball out of collision
             float vdotn = ball.xvel * nx + ball.yvel * ny;
