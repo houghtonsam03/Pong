@@ -140,10 +140,13 @@ public class Game {
                 else rectHor = rectX + rectW; // Right side
                 if (ball.yvel > 0) rectVer = rectY; // Top side
                 else rectVer = rectY + rectH; // Bottom side
+
+                // Find the closest time to exit the blocker in x and y direction.
                 float alphaX = (middleX - rectHor) / ball.xvel;
                 float alphaY = (middleY - rectVer) / ball.yvel;
                 float alpha = Math.min(Math.abs(alphaX), Math.abs(alphaY));
                 float e = 0.001f; // Small value to ensure the ball is out of the blocker.
+
                 // Move the ball out of the blocker then run physics again.
                 ball.x -= ball.xvel * (alpha+e);
                 ball.y -= ball.yvel * (alpha+e);
@@ -152,7 +155,6 @@ public class Game {
             }
             // Flat case
             else {
-
                 // Left or Right side
                 if (closestX == rectX || closestX == rectX + rectW) {
                     nx = -Math.signum(ball.xvel);
@@ -165,7 +167,7 @@ public class Game {
                 }
                 
             }
-            // Push the ball out of collision
+            // Reflect velocity
             float vdotn = ball.xvel * nx + ball.yvel * ny;
             ball.xvel -= 2f * vdotn * nx;
             ball.yvel -= 2f * vdotn * ny;

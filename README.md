@@ -29,3 +29,11 @@ A simple pong game which is intended to have a simple AI framework.
 * Y is the amount of balls in each game.
 * L is whether the left blocker is an AI
 * R is whether the right blocker is an AI.
+
+## Bugs
+* Squishing the ball using the blocker onto the edges of the screen acts weirdly.
+* Corner bounces sometimes weird.
+## To-Do
+* Pause menu / Startup menu
+* Restart functionality
+* AI-Agents
