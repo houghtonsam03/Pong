@@ -10,8 +10,7 @@ public class Main {
         sc.nextLine();
         sc.close();
 
-        PongSettings settings = new PongSettings("settings.properties");
-        gm.Setup(settings.GameAmount(),settings.BallAmount(),settings.LeftIsAI(),settings.RightIsAI());
+        gm.Setup();
         gm.Start();
     }
 }

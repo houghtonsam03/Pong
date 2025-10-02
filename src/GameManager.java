@@ -2,20 +2,36 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class GameManager {
+    //Settings
+    private int gameAmount;
+    private int ballAmount;
+    private boolean L; // If Left is an AI
+    private boolean R; // If Right is an AI
+    private boolean graphics; // Disables the Pong graphics and lets all games run entirely without visuals. Good for optimization.
+
     private Game[] games; // List of all games
     private Game[] shownGames; // List of games that are drawn
     private Agent[] agents; // A list of AI-agents
     private float[][] gameInfo; // The stored game-states
     private int[] score; // How many games have been won {LeftWin,RightWin,Ties}
     private Window window;
-    private boolean L; // If Left is an AI
-    private boolean R; // If Right is an AI
 
-    public GameManager() {
-        
+    public GameManager() { // Default values
+        gameAmount = 1;
+        ballAmount = 1;
+        L = false;
+        R = false;
+        graphics = true;
     }
-    public void Setup(int gameAmount,int ballAmount,boolean LAI,boolean RAI) {
-        if (gameAmount > 1 && (!LAI || !RAI)) {
+    private void updateSettings(int g,int b,boolean LAI,boolean RAI,boolean gra) {
+        gameAmount = g;
+        ballAmount = b;
+        L = LAI;
+        R = RAI;
+        graphics = gra;
+    }
+    public void Setup() {
+        if (gameAmount > 1 && (!L || !R)) {
             throw new RuntimeException("Humans cannot play multiple games in parallell.");
         }
         else if (gameAmount < 1 ) {
@@ -28,8 +44,6 @@ public class GameManager {
 
         // Creating Agents (AI)
         agents = new Agent[2];
-        L = LAI;
-        R = RAI;
         if (L)
             agents[0] = new Agent(true,this,gameAmount,ballAmount);
         if (R)
