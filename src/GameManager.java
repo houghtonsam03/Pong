@@ -11,8 +11,10 @@ public class GameManager {
     private boolean L; // If Left is an AI
     private boolean R; // If Right is an AI
 
-    public GameManager(int gameAmount,int ballAmount,boolean LAI, boolean RAI) {
-        // Checking bad parameters
+    public GameManager() {
+        
+    }
+    public void Setup(int gameAmount,int ballAmount,boolean LAI,boolean RAI) {
         if (gameAmount > 1 && (!LAI || !RAI)) {
             throw new RuntimeException("Humans cannot play multiple games in parallell.");
         }
@@ -55,7 +57,6 @@ public class GameManager {
         }
         // Setup Inputs
         SetupKeyInputs();
-        
     }
     public void Start() {
         for (Game g : games) {

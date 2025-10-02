@@ -16,19 +16,16 @@ A simple pong game which is intended to have a simple AI framework.
 
 ## How to run the game from a terminal.
 1) Create a build folder as well as a .vscode folder under the Pong folder.
-2) Create a settings.json file in the .vscode folder and add
+2) Create a settings.json file in the .vscode folder and add:
 ```
 {
     "java.project.sourcePaths": ["src"],
     "java.project.outputPath": "build"
 }
 ```
-3) Run: `javac -d build src/*.java`
-4) Run: `java -cp build Main [X] [Y] [L] [R]`  where:
-* X is the amount of simultaneous games.
-* Y is the amount of balls in each game.
-* L is whether the left blocker is an AI
-* R is whether the right blocker is an AI.
+3) Run: `javac -d build src/*.java`.
+4) Set wanted properties in the file "settings.properties".
+5) Run: `java -cp build Main`.
 
 ## Bugs
 * Squishing the ball using the blocker onto the edges of the screen acts weirdly.

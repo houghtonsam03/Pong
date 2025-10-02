@@ -1,16 +1,17 @@
-import java.awt.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            throwable.printStackTrace(); // log error
-            for (Frame f : Frame.getFrames()) {
-                f.dispose();              // close all windows
-            }
-            System.exit(1);              // exit program
-        });
-        GameManager gm = new GameManager(Integer.parseInt(args[0]),Integer.parseInt(args[1]),(args[2].equals("1")),(args[3].equals("1")));
-        Thread.sleep(1000);
+        
+        GameManager gm = new GameManager();
+        
+        System.out.println("Press Enter to start the game...");
+        Scanner sc = new Scanner(System.in);
+        sc.nextLine();
+        sc.close();
+
+        PongSettings settings = new PongSettings("settings.properties");
+        gm.Setup(settings.GameAmount(),settings.BallAmount(),settings.LeftIsAI(),settings.RightIsAI());
         gm.Start();
     }
 }
