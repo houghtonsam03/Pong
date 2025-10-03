@@ -27,6 +27,19 @@ A simple pong game which is intended to have a simple AI framework.
 4) Set wanted properties in the file "settings.properties".
 5) Run: `java -cp build Main`.
 
+# Controls
+1 Human player:
+* W = Player move up.
+* S = Player move down.
+
+2 Human players:
+* W = Left player move up.
+* S = Left player move down.
+* Up = Right player move up.
+* Down = Right player move down.
+
+
+
 ## Bugs
 * Squishing the ball using the blocker onto the edges of the screen acts weirdly.
 * Corner bounces sometimes weird.
