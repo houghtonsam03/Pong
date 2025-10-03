@@ -38,7 +38,8 @@ A simple pong game which is intended to have a simple AI framework.
 * Up = Right player move up.
 * Down = Right player move down.
 
-
+More
+* Use"ESC" to pause the game during runtime.
 
 ## Bugs
 * Squishing the ball using the blocker onto the edges of the screen acts weirdly.
