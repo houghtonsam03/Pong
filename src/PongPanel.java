@@ -2,18 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PongPanel extends JPanel{
-    static int gameWidth = 3000;
-    static int gameHeight = 1600;
-    static int blockerWidth = 100;
-    static int blockerHeight = 500;
-    static int ballSize = 100;
-    static int LBlockerX = 200;
-    static int RBlockerX = gameWidth-(LBlockerX+blockerWidth);
+    static int GAME_WIDTH = 3000;
+    static int GAME_HEIGHT = 1600;
+    static double ASPECT_RATIO = ((double)GAME_WIDTH)/GAME_HEIGHT;
+    static int BLOCKER_WIDTH = 100;
+    static int BLOCKER_HEIGHT = 500;
+    static int BALL_SIZE = 100;
+    static int L_BLOCKER_X = 200;
+    static int R_BLOCKER_X = GAME_WIDTH-(L_BLOCKER_X+BLOCKER_WIDTH);
 
     private float[] state;
     
     public PongPanel(float[] st) {
-
         state = st;
 
         this.setLayout(null);
@@ -27,20 +27,20 @@ public class PongPanel extends JPanel{
         Graphics2D g2 = (Graphics2D) g;
 
         // Compute scale factors dynamically
-        float scaleX = getWidth() / (float) gameWidth;
-        float scaleY = getHeight() / (float) gameHeight;
+        float scaleX = getWidth() / (float) GAME_WIDTH;
+        float scaleY = getHeight() / (float) GAME_HEIGHT;
 
         // Example: draw left blocker
-        int x = Math.round(LBlockerX * scaleX);
+        int x = Math.round(L_BLOCKER_X * scaleX);
         int y = Math.round(state[0] * scaleY);
-        int w = Math.round(blockerWidth * scaleX);
-        int h = Math.round(blockerHeight * scaleY);
+        int w = Math.round(BLOCKER_WIDTH * scaleX);
+        int h = Math.round(BLOCKER_HEIGHT * scaleY);
 
         g2.setColor(Color.WHITE);
         g2.fillRect(x, y, w, h);
 
         // Example: draw right blocker
-        x = Math.round(RBlockerX * scaleX);
+        x = Math.round(R_BLOCKER_X * scaleX);
         y = Math.round(state[1]* scaleY);
         g2.fillRect(x, y, w, h);
 
@@ -50,15 +50,12 @@ public class PongPanel extends JPanel{
             if (!Float.isNaN(state[i]) && !Float.isNaN(state[i+1])) {
                 int bx = Math.round(state[i] * scaleX);
                 int by = Math.round(state[i+1] * scaleY);
-                int bs = Math.round(ballSize * scaleX); // scale uniformly with X or average X/Y
+                int bs = Math.round(BALL_SIZE * scaleX); // scale uniformly with X or average X/Y
                 g2.fillOval(bx, by, bs, bs);
             }
         }
     }
     public void Update(float[] st) {
         state = st;
-    }
-    public void GameOver() {
-        state = new float[]{(gameHeight-blockerHeight)/2,(gameHeight-blockerHeight)/2};
     }
 }

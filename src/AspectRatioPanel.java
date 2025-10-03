@@ -1,32 +1,41 @@
 import javax.swing.*;
-import java.awt.*;
 
-class AspectRatioPanel extends JPanel {
+public class AspectRatioPanel extends JPanel {
     private final double aspectRatio;
-    private final Component child;
+    private final JPanel child; // the actual content to keep aspect ratio
 
-    public AspectRatioPanel(double aspectRatio, Component child) {
+    public AspectRatioPanel(double aspectRatio, JPanel child) {
         this.aspectRatio = aspectRatio;
         this.child = child;
-        this.setBackground(Color.DARK_GRAY);
-        setLayout(null); // we’ll position child manually
-        add(child);
+        this.setLayout(null); // use absolute positioning for resizing
+        this.add(child);
+        this.setOpaque(false);
+
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                resizeChild();
+            }
+        });
     }
 
-    @Override
-    public void doLayout() {
+    private void resizeChild() {
         int w = getWidth();
         int h = getHeight();
         double current = (double) w / h;
 
-        // keep ratio 30:18
         if (current > aspectRatio) {
+            // too wide → limit width
             w = (int) (h * aspectRatio);
         } else {
+            // too tall → limit height
             h = (int) (w / aspectRatio);
         }
 
-        // center the child
-        child.setBounds((getWidth() - w) / 2, (getHeight() - h) / 2, w, h);
+        int x = (getWidth() - w) / 2;
+        int y = (getHeight() - h) / 2;
+        child.setBounds(x, y, w, h);
+        child.revalidate();
+        child.repaint();
     }
 }

@@ -12,16 +12,23 @@ public class GameManager {
     private Game[] games; // List of all games
     private Game[] shownGames; // List of games that are drawn
     private Agent[] agents; // A list of AI-agents
+    private float[] startUpState;
     private float[][] gameInfo; // The stored game-states
     private int[] score; // How many games have been won {LeftWin,RightWin,Ties}
     private Window window;
 
     public GameManager() { // Default values
-        gameAmount = 1;
+        gameAmount = 8;
         ballAmount = 1;
-        L = false;
-        R = false;
+        L = true;
+        R = true;
         graphics = true;
+
+        Game g = new Game(-1,1,1,this);
+        g.Setup();
+        startUpState = g.getState();
+
+        window = new Window(this);
     }
     private void updateSettings(int g,int b,boolean LAI,boolean RAI,boolean gra) {
         gameAmount = g;
@@ -57,9 +64,6 @@ public class GameManager {
         for (int i=0;i<shown;i++) 
             shownGames[i] = games[i];
 
-        // Window
-        window = new Window(shown,gameInfo);
-
         // Setup games
         int sp = 1;
         if (gameAmount > 1)
@@ -73,6 +77,10 @@ public class GameManager {
         SetupKeyInputs();
     }
     public void Start() {
+        // Window
+        Setup();
+        window.StartGame(gameAmount,gameInfo);
+
         for (Game g : games) {
             Thread t = new Thread(() -> {
                 try {
@@ -83,6 +91,12 @@ public class GameManager {
             });
             t.start();
         }
+    }
+    public void Pause() {
+        for (Game g : games) {
+            g.TogglePause();
+        }
+        window.TogglePause();
     }
 
     public void Update(int id,float[] info) {
@@ -103,13 +117,15 @@ public class GameManager {
             score[1]++;
         else
             score[2]++;
-        window.UpdateScore(id,score);
+        window.UpdateScore(score);
     }
     private void SetupKeyInputs() {
         JPanel panel = window.getPanel(); // Make sure Window has a getPanel() method
         InputMap im = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = panel.getActionMap();
 
+
+        // Player movements
         String leftUp = null; String leftDown = null;
         String rightUp = null; String rightDown = null;
         if (!L && !R) {
@@ -164,6 +180,11 @@ public class GameManager {
                 public void actionPerformed(ActionEvent e) { games[0].ListenHuman(false, false, false); }
             });
         }
+        // Pause game
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0), "pause");
+        am.put("pause", new AbstractAction() { public void actionPerformed(ActionEvent e) { Pause(); }
+        });
+
     }
     public void Listen(int id, boolean left, boolean actionUp) {
         games[id].ListenAI(left, actionUp);

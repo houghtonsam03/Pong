@@ -2,93 +2,66 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame{
-    private int windowWidth = 2500;
-    private int windowHeight = 1200;
-    private PongPanel[] pongList;
-    private JLabel score;
-    public Window(int games,float[][] states) {
-
-        JPanel scoreboard = new JPanel(); scoreboard.setBackground(Color.BLACK);
-        scoreboard.setLayout(new GridBagLayout()); scoreboard.setPreferredSize(new Dimension(windowWidth,windowHeight/4));
+    private boolean paused;
+    private GameWindow gamePanel;
+    private MainMenu mainMenu;
+    private PauseMenu pauseMenu;
+    private GameManager gm;
+    public Window(GameManager manager) {
         
-
-        // Creating the "Scoreboard" Title
-        JLabel scoreTitle = new JLabel("Scoreboard");
-        scoreTitle.setFont(new Font("SansSerif",Font.BOLD,50)); scoreTitle.setForeground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 1.0; gbc.weighty = 0.1; gbc.anchor = GridBagConstraints.CENTER; gbc.fill = GridBagConstraints.NONE;
-        scoreboard.add(scoreTitle,gbc);
-
-
-        // Creating the scoreboard
-        score = new JLabel(0 + " - " + 0 + "  (" + 0 + ")");
-        score.setFont(new Font("SansSerif",Font.BOLD,50)); score.setForeground(Color.WHITE);
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 1.0; gbc.weighty = 0.2; gbc.anchor = GridBagConstraints.PAGE_START; gbc.fill = GridBagConstraints.NONE;
-        scoreboard.add(score,gbc);
-        
-        // Creating the gameboard
-        JPanel gameboard = new JPanel(); gameboard.setBackground(Color.DARK_GRAY);
-        gameboard.setLayout(new BorderLayout());
-
-
-        // Creating the PongGrid
-        JPanel pongGrid = new JPanel(new GridBagLayout()); pongGrid.setBackground(Color.DARK_GRAY);
-        gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-
-        int rows=1; int cols=1;
-        switch (games) {
-            case 1: rows = 1; cols = 1; break;
-            case 2: rows = 1; cols = 2; break;
-            case 4: rows = 2; cols = 2; break;
-            case 6: rows = 2; cols = 3; break;
-            case 8: rows = 2; cols = 4; break;
-        }
-        // Creating PongPanels
-        pongList = new PongPanel[games];
-        int index = 0;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (index >= games) break;
-
-                pongList[index] = new PongPanel(states[index]);
-                AspectRatioPanel wrapper = new AspectRatioPanel(30.0/18.0, pongList[index]);
-                gbc.gridx = c;
-                gbc.gridy = r;
-                pongGrid.add(wrapper, gbc);
-                index++;
-            }
-        }
-        // Adding marginals and the PonGrid to the gameboard
-        // Wrap gameBoard with padding/margins
-        int marginSize = 200; // pixels on each side
-        gameboard.add(Box.createRigidArea(new Dimension(marginSize, 0)), BorderLayout.WEST);
-        gameboard.add(Box.createRigidArea(new Dimension(marginSize, 0)), BorderLayout.EAST);
-        gameboard.add(Box.createRigidArea(new Dimension(0, marginSize/2)), BorderLayout.NORTH);
-        gameboard.add(Box.createRigidArea(new Dimension(0, marginSize/2)), BorderLayout.SOUTH);
-        gameboard.add(pongGrid, BorderLayout.CENTER); // grid in the middle
-
-        // Final touches
         this.setLayout(new BorderLayout());
-        this.setSize(windowWidth,windowHeight);
+
+        paused = true;
+        gm = manager;
+
+        // Window properties
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        this.add(scoreboard, BorderLayout.NORTH); this.add(gameboard, BorderLayout.CENTER);
+        mainMenu = new MainMenu(gm);
+        pauseMenu = new PauseMenu(gm);
+        this.add(mainMenu);
+        this.revalidate();
+        this.repaint();
         this.setVisible(true);
     }
+    public boolean TogglePause() {
+        if (!paused) {
+            this.remove(gamePanel);
+            this.add(pauseMenu);
+        }
+        else {
+            this.remove(pauseMenu);
+            this.add(gamePanel);
+        }
+        this.revalidate();
+        this.repaint();
+        paused = !paused;
+        return paused;
+    }
+    public void StartGame(int games, float[][] states) {
+        gamePanel = new GameWindow(gm,games,states);
 
+        paused = false;
+        this.remove(mainMenu);
+        this.add(gamePanel);
+
+        this.revalidate();
+        this.repaint();
+    }
     public void Update(int id, float[] state) {
-        pongList[id].Update(state);
-        pongList[id].repaint();
+        gamePanel.Update(id,state);
+        if (!paused) gamePanel.repaint();
+        else {
+            System.out.println("ERROR: Tried to update while paused");
+        }
     }
 
-    public void UpdateScore(int id, int[] sc) {
-        score.setText(Integer.toString(sc[0]) + " - " + Integer.toString(sc[1]) + "  (" + Integer.toString(sc[2])+ ")");
-        pongList[id].GameOver();
-        repaint();
+    public void UpdateScore(int[] sc) {
+        gamePanel.setScore(sc);
+        if (!paused) gamePanel.repaint();
+        else {
+            System.out.println("ERROR: Tried to update score while paused");
+        }
     }
 
     public JPanel getPanel() {
