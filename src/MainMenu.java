@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class MainMenu extends JPanel {
     public MainMenu(GameManager manager) {
-        this.setBackground(Color.BLACK);
+        this.setBackground(Color.DARK_GRAY);
         this.setLayout(new GridBagLayout()); // layout for precise positioning
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -22,8 +22,8 @@ public class MainMenu extends JPanel {
         JButton startButton = new JButton("Start Game");
         startButton.setPreferredSize(new Dimension(300, 100));
         startButton.setFont(new Font("SansSerif", Font.BOLD, 40));
-        startButton.setForeground(Color.BLACK);
-        startButton.setBackground(Color.WHITE);
+        startButton.setForeground(Color.WHITE);
+        startButton.setBackground(Color.BLACK);
         startButton.setFocusable(false);
         startButton.addActionListener(e -> manager.Start());
         this.add(startButton, gbc);
