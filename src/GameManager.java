@@ -147,11 +147,6 @@ public class GameManager {
             if (!hiddenGames.isEmpty()) {
                 int newID = hiddenGames.remove(0);
                 shownGames[shownID] = newID;
-                System.out.println();
-                System.out.println(id);
-                for (int i=0;i<shownGames.length;i++) {
-                    System.out.println(Integer.toString(i)+": "+Integer.toString(shownGames[i]));
-                }
             }
         }
     }
