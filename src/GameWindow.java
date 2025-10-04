@@ -1,10 +1,11 @@
+
 import java.awt.*;
 import javax.swing.*;
 
 public class GameWindow extends JPanel{
     private PongPanel[] pongList;
     private JLabel score;
-    GameWindow(GameManager manager, int games, float[][] states) {
+    GameWindow(GameManager manager,float[][] states) {
 
         // Create scoreboard top of screen
         JPanel scoreboard = new JPanel(); scoreboard.setBackground(Color.BLACK);
@@ -36,6 +37,7 @@ public class GameWindow extends JPanel{
         gbc.weighty = 1.0;
 
         int rows=1; int cols=1;
+        int games = states.length;
         switch (games) {
             case 1: rows = 1; cols = 1; break;
             case 2: rows = 1; cols = 2; break;
@@ -53,8 +55,8 @@ public class GameWindow extends JPanel{
                 gbc.gridy = r;
 
                 pongList[index] = new PongPanel(states[index]);
-                AspectRatioPanel aspPan = new AspectRatioPanel(PongPanel.ASPECT_RATIO,pongList[index]);
-                pongGrid.add(aspPan, gbc);
+                AspectRatioPanel wrapper = new AspectRatioPanel(PongPanel.ASPECT_RATIO,pongList[index]);
+                pongGrid.add(wrapper, gbc);
                 index++;
             }
         }

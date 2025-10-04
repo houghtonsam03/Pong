@@ -32,7 +32,7 @@ public class PongPanel extends JPanel{
 
         // Example: draw left blocker
         int x = Math.round(L_BLOCKER_X * scaleX);
-        int y = Math.round(state[0] * scaleY);
+        int y = Math.round(state[1] * scaleY);
         int w = Math.round(BLOCKER_WIDTH * scaleX);
         int h = Math.round(BLOCKER_HEIGHT * scaleY);
 
@@ -41,12 +41,12 @@ public class PongPanel extends JPanel{
 
         // Example: draw right blocker
         x = Math.round(R_BLOCKER_X * scaleX);
-        y = Math.round(state[1]* scaleY);
+        y = Math.round(state[2]* scaleY);
         g2.fillRect(x, y, w, h);
 
         // Example: draw balls
         g2.setColor(Color.RED);
-        for (int i=2;i<state.length;i=i+2) { 
+        for (int i=3;i<state.length;i=i+2) { 
             if (!Float.isNaN(state[i]) && !Float.isNaN(state[i+1])) {
                 int bx = Math.round(state[i] * scaleX);
                 int by = Math.round(state[i+1] * scaleY);

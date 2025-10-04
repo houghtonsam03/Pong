@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -6,8 +7,10 @@ public class Window extends JFrame{
     private GameWindow gamePanel;
     private MainMenu mainMenu;
     private PauseMenu pauseMenu;
+    private SettingsPanel settingsPanel;
+    private ControlsPanel controlsPanel;
     private GameManager gm;
-    public Window(GameManager manager) {
+    public Window(GameManager manager, float[] startup) {
         
         this.setLayout(new BorderLayout());
 
@@ -17,8 +20,10 @@ public class Window extends JFrame{
         // Window properties
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        mainMenu = new MainMenu(gm);
+        mainMenu = new MainMenu(gm,startup);
         pauseMenu = new PauseMenu(gm);
+        settingsPanel = new SettingsPanel(gm);
+        controlsPanel = new ControlsPanel(gm);
         this.add(mainMenu);
         this.revalidate();
         this.repaint();
@@ -38,8 +43,28 @@ public class Window extends JFrame{
         paused = !paused;
         return paused;
     }
-    public void StartGame(int games, float[][] states) {
-        gamePanel = new GameWindow(gm,games,states);
+    public void ToggleSettings() {
+        JPanel current = (JPanel)this.getContentPane().getComponent(0);
+        this.remove(current);
+
+        if (current == settingsPanel) this.add(mainMenu);
+        else this.add(settingsPanel);
+        
+        this.revalidate();
+        this.repaint();
+    }
+    public void ToggleControls() {
+        JPanel current = (JPanel)this.getContentPane().getComponent(0);
+        this.remove(current);
+
+        if (current == controlsPanel) this.add(mainMenu);
+        else this.add(controlsPanel);
+
+        this.revalidate();
+        this.repaint();
+    }
+    public void StartGame(float[][] states) {
+        gamePanel = new GameWindow(gm,states);
 
         paused = false;
         this.remove(mainMenu);
@@ -51,17 +76,11 @@ public class Window extends JFrame{
     public void Update(int id, float[] state) {
         gamePanel.Update(id,state);
         if (!paused) gamePanel.repaint();
-        else {
-            System.out.println("ERROR: Tried to update while paused");
-        }
     }
 
     public void UpdateScore(int[] sc) {
         gamePanel.setScore(sc);
         if (!paused) gamePanel.repaint();
-        else {
-            System.out.println("ERROR: Tried to update score while paused");
-        }
     }
 
     public JPanel getPanel() {

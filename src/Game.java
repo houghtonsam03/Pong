@@ -271,9 +271,10 @@ public class Game {
         paused = !paused;
     }
     public float[] getState() {
-        float[] update = new float[2*balls.size()+2];
-        update[0] = BlockerMovement[0]; update[1] = BlockerMovement[1];
-        int i = 2;
+        float[] update = new float[2*balls.size()+3];
+        update[0] = ID;
+        update[1] = BlockerMovement[0]; update[2] = BlockerMovement[1];
+        int i = 3;
         for(Ball ball : balls) {
             update[i] = ball.x;
             update[i+1] = ball.y;

@@ -45,15 +45,12 @@ More
 * Squishing the ball using the blocker onto the edges of the screen acts weirdly.
 * Corner bounces sometimes weird.
 ## To-Do
-* Add "settings" to startup menu
-* Add "controls" to startup menu
-* Make pause menu transperent
+* Implement Settings in settings menu
+* Implement Controls in controls menu
 * Add "new game" to pause menu
 * Add "unpause" to pause menu
-* Add "controls" to pause menu
 * Add "stats" to pause menu
 * Add "pause" button to game screen
 * Add "current games" to game screen
 * Add "timer" to game screen
-* Swap out shown games when gameover
 * AI-Agents

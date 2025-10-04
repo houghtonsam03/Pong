@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 
 public class AspectRatioPanel extends JPanel {
