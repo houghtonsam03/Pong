@@ -12,4 +12,25 @@ public class Settings {
         RAI = R;
         graphics = graph;
     }
+    public boolean[] getAI() {
+        return new boolean[]{LAI,RAI};
+    }
+    public int getGames() {
+        return gameAmount;
+    }
+    public int getBalls() {
+        return ballAmount;
+    }
+    void updateGameAmount(int g) {
+        gameAmount = g;
+    }
+    void updateBallAmount(int b) {
+        ballAmount = b;
+    }
+    void updateLAI(boolean L) {
+        LAI = L;
+    }
+    void updateRAI(boolean R) {
+        RAI = R;
+    }
 }

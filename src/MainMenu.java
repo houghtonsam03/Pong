@@ -53,7 +53,7 @@ public class MainMenu extends JPanel {
         startButton.setFocusPainted(false);
         startButton.setFont(new Font("SansSerif",Font.BOLD,60));
         startButton.addActionListener(e -> {
-            manager.Start();
+            manager.Startup();
         });
         startButton.setBorder(BorderFactory.createLineBorder(Color.WHITE,1));
         mainPanel.add(startButton,mainGbc);

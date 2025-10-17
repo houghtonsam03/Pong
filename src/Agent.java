@@ -1,7 +1,7 @@
 public class Agent {
-
     private GameManager manager;
     private float[][] states;
+    @SuppressWarnings("unused")
     private int ballAmount;
     private boolean left;
     Agent(boolean l,GameManager man,int games,int bAmount) {

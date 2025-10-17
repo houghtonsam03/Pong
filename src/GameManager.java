@@ -15,7 +15,7 @@ public class GameManager {
     private int[] score; // How many games have been won {LeftWin,RightWin,Ties}
     private Window window;
     public GameManager() { // Default values
-        settings = new Settings(1000,1,true,true,true);
+        settings = new Settings(1000,8,true,true,true);
 
         Game g = new Game(-1,1,1,this);
         g.Setup();
@@ -98,6 +98,9 @@ public class GameManager {
             });
             t.start();
         }
+    }
+    public void Startup() {
+        window.toggleStartup();
     }
     public void Pause() {
         for (Game g : games) {
