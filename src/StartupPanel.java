@@ -44,6 +44,7 @@ public class StartupPanel extends JPanel{
             LPlayerToggle.addActionListener(e -> {
                 settings.updateLAI(!LPlayerToggle.isSelected());
             });
+            LPlayerToggle.setSelected(settings.getAI()[0]);
 
             row2.add(LPlayerToggle,colGBC);
             // Buffer
@@ -146,6 +147,7 @@ public class StartupPanel extends JPanel{
             RPLayerToggle.addActionListener(e -> {
                 settings.updateRAI(RPLayerToggle.isSelected());
             });
+            RPLayerToggle.setSelected(settings.getAI()[1]);
             row2.add(RPLayerToggle,colGBC);
             // Right buffer
             colGBC.gridx = 8; colGBC.gridy = 0; colGBC.weightx = 0.27; colGBC.weighty = 1; colGBC.fill = GridBagConstraints.BOTH; colGBC.anchor = GridBagConstraints.CENTER;
